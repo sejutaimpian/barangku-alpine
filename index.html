@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barangku - AlpineJS</title>
+    <link rel="shortcut icon" href="assets/box.svg" type="image/x-icon">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.12.0/dist/cdn.min.js"></script>
+    <style>
+        [x-cloak] {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50">
+    <!-- Modal -->
+    <div x-data x-cloak x-show="$store.barangku.modal"
+        class="fixed top-0 left-0 right-0 z-50 flex items-center justify-center w-full h-screen bg-slate-800/80 md:mx-auto">
+        <div class="flex items-center px-4">
+            <div class="flex flex-wrap items-center justify-center bg-sky-950">
+                <!-- setPilihAvatar -->
+                <div x-show="$store.barangku.pilihAvatar" x-on:click.outside="$store.barangku.setPilihAvatar()">
+                    <h2
+                        class="w-full px-2 py-2 text-xl font-bold text-center border bg-slate-950 md:text-3xl text-sky-300 border-sky-300">
+                        Pilih
+                        Avatarmu
+                    </h2>
+                    <div class="flex flex-wrap items-center px-2 my-10 justify-evenly">
+                        <template x-for="avatar in $store.barangku.avatars">
+                            <img x-on:click="$store.barangku.setAvatar(avatar)" :src="avatar" alt="avatar"
+                                class="w-20 h-20 mx-2 my-2 rounded-full cursor-pointer bg-sky-300">
+                        </template>
+                    </div>
+                </div>
+                <!-- setUsername -->
+                <div x-show="$store.barangku.pilihUsername" x-on:click.outside="$store.barangku.setPilihUsername()">
+                    <h2
+                        class="w-full px-2 py-2 text-xl font-bold text-center border bg-slate-950 md:text-3xl text-sky-300 border-sky-300">
+                        Edit Username
+                    </h2>
+                    <form x-on:submit.prevent="$store.barangku.setPilihUsername()" class="flex gap-2 mx-4 my-4">
+                        <input class="px-1 mx-auto rounded" type="text" x-model="$store.barangku.username">
+                        <button
+                            class="px-4 py-1 border rounded-md border-sky-300 text-slate-800 hover:bg-sky-200 hover:text-slate-950 bg-sky-100">Update</button>
+                    </form>
+                </div>
+                <!-- setBarang -->
+                <div x-show="$store.barangku.pilihBarang" x-on:click.outside="$store.barangku.setPilihBarang()">
+                    <h2
+                        class="w-full px-2 py-2 text-xl font-bold text-center border bg-slate-950 md:text-3xl text-sky-300 border-sky-300">
+                        Tambah Barang
+                    </h2>
+                    <form x-on:submit.prevent="$store.barangku.setBarang()"
+                        class="flex flex-wrap gap-2 mx-4 my-4 md:w-96">
+                        <div class="flex flex-wrap w-full my-1">
+                            <label for="namaBarang" class="w-full text-white md:w-1/3">Nama Barang</label>
+                            <input id="namaBarang" class="w-full px-1 rounded md:w-2/3" type="text"
+                                x-model="$store.barangku.namaBarang" placeholder="Nama Barang ....">
+                        </div>
+                        <div class="flex flex-wrap w-full my-1">
+                            <label for="banyak" class="w-full text-white md:w-1/3">Banyak</label>
+                            <input id="banyak" class="w-full px-1 rounded md:w-2/3" type="number"
+                                x-model="$store.barangku.banyak" placeholder="Banyak Barang ....">
+                        </div>
+                        <div class="flex flex-wrap w-full my-1">
+                            <label for="kategori" class="w-full text-white md:w-1/3">Kategori</label>
+                            <select class="flex-1" id="kategori" x-model="$store.barangku.kategori">
+                                <option value="" disabled selected>Pilih Kategori ...</option>
+                                <template x-for="(item, index) in $store.barangku.listKategori" x-init="">
+                                    <option :value="index" x-text="item.namaKategori">
+                                    </option>
+                                </template>
+                            </select>
+                        </div>
+                        <button
+                            class="px-4 py-1 ml-auto border rounded-md border-sky-300 text-slate-800 hover:bg-sky-200 hover:text-slate-950 bg-sky-100">Update</button>
+                    </form>
+                </div>
+                <!-- setEdit -->
+                <div x-show="$store.barangku.pilihEdit" x-on:click.outside="$store.barangku.setPilihEdit()">
+                    <h2
+                        class="w-full px-2 py-2 text-xl font-bold text-center border bg-slate-950 md:text-3xl text-sky-300 border-sky-300">
+                        Edit Barang
+                    </h2>
+                    <form x-on:submit.prevent="$store.barangku.updateBarang()"
+                        class="flex flex-wrap gap-2 mx-4 my-4 md:w-96">
+                        <div class="flex flex-wrap w-full my-1">
+                            <label for="namaBarang" class="w-full text-white md:w-1/3">Nama Barang</label>
+                            <input id="namaBarang" class="w-full px-1 rounded md:w-2/3" type="text"
+                                x-model="$store.barangku.namaBarang" placeholder="Nama Barang ....">
+                        </div>
+                        <div class="flex flex-wrap w-full my-1">
+                            <label for="banyak" class="w-full text-white md:w-1/3">Banyak</label>
+                            <input id="banyak" class="w-full px-1 rounded md:w-2/3" type="number"
+                                x-model="$store.barangku.banyak" placeholder="Banyak Barang ....">
+                        </div>
+                        <div class="flex flex-wrap w-full my-1">
+                            <label for="kategori" class="w-full text-white md:w-1/3">Kategori</label>
+                            <select class="flex-1" id="kategori" x-model="$store.barangku.kategori">
+                                <template x-for="(item, index) in $store.barangku.listKategori">
+                                    <option :value="index" x-text="item.namaKategori">
+                                    </option>
+                                </template>
+                            </select>
+                        </div>
+                        <button
+                            class="px-4 py-1 ml-auto border rounded-md border-sky-300 text-slate-800 hover:bg-sky-200 hover:text-slate-950 bg-sky-100">Update</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- hero -->
+    <div class="px-5 py-10 text-center bg-slate-900 text-slate-100">
+        <svg class="block mx-auto" fill="white" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="64"
+            height="64" viewBox="0 0 64 64">
+            <path
+                d="M 7 10.058594 C 5.347656 10.058594 4 11.402344 4 13.058594 L 4 19.058594 C 4 19.859375 4.3125 20.613281 4.878906 21.179688 C 5.199219 21.5 5.582031 21.742188 6 21.890625 L 6 53.058594 C 6 54.710938 7.347656 56.058594 9 56.058594 L 57 56.058594 C 58.652344 56.058594 60 54.710938 60 53.058594 L 60 21.890625 C 60.417969 21.742188 60.800781 21.5 61.121094 21.179688 C 61.6875 20.613281 62 19.859375 62 19.058594 L 62 13.058594 C 62 11.402344 60.652344 10.058594 59 10.058594 Z M 7 12.058594 L 59 12.058594 C 59.550781 12.058594 60 12.503906 60 13.058594 L 60 19.058594 C 60 19.324219 59.894531 19.578125 59.707031 19.765625 C 59.519531 19.953125 59.269531 20.058594 59 20.058594 L 55 20.058594 C 54.449219 20.058594 54 20.503906 54 21.058594 C 54 21.609375 54.449219 22.058594 55 22.058594 L 58 22.058594 L 58 53.058594 C 58 53.609375 57.550781 54.058594 57 54.058594 L 9 54.058594 C 8.449219 54.058594 8 53.609375 8 53.058594 L 8 22.058594 L 43 22.058594 C 43.550781 22.058594 44 21.609375 44 21.058594 C 44 20.503906 43.550781 20.058594 43 20.058594 L 7 20.058594 C 6.730469 20.058594 6.480469 19.953125 6.292969 19.765625 C 6.105469 19.578125 6 19.324219 6 19.058594 L 6 13.058594 C 6 12.503906 6.449219 12.058594 7 12.058594 Z M 47 20.058594 C 46.449219 20.058594 46 20.503906 46 21.058594 C 46 21.609375 46.449219 22.058594 47 22.058594 L 51 22.058594 C 51.550781 22.058594 52 21.609375 52 21.058594 C 52 20.503906 51.550781 20.058594 51 20.058594 Z M 26 26 C 23.792969 26 22 27.792969 22 30 C 22 32.207031 23.792969 34 26 34 L 40 34 C 42.207031 34 44 32.207031 44 30 C 44 27.792969 42.207031 26 40 26 Z M 26 28 L 40 28 C 41.101563 28 42 28.898438 42 30 C 42 31.101563 41.101563 32 40 32 L 26 32 C 24.898438 32 24 31.101563 24 30 C 24 28.898438 24.898438 28 26 28 Z M 13 48.058594 C 12.449219 48.058594 12 48.503906 12 49.058594 L 12 51.058594 C 12 51.609375 12.449219 52.058594 13 52.058594 C 13.550781 52.058594 14 51.609375 14 51.058594 L 14 49.058594 C 14 48.503906 13.550781 48.058594 13 48.058594 Z M 18 48.058594 C 17.449219 48.058594 17 48.503906 17 49.058594 L 17 51.058594 C 17 51.609375 17.449219 52.058594 18 52.058594 C 18.550781 52.058594 19 51.609375 19 51.058594 L 19 49.058594 C 19 48.503906 18.550781 48.058594 18 48.058594 Z M 23 48.058594 C 22.449219 48.058594 22 48.503906 22 49.058594 L 22 51.058594 C 22 51.609375 22.449219 52.058594 23 52.058594 C 23.550781 52.058594 24 51.609375 24 51.058594 L 24 49.058594 C 24 48.503906 23.550781 48.058594 23 48.058594 Z M 28 48.058594 C 27.449219 48.058594 27 48.503906 27 49.058594 L 27 51.058594 C 27 51.609375 27.449219 52.058594 28 52.058594 C 28.550781 52.058594 29 51.609375 29 51.058594 L 29 49.058594 C 29 48.503906 28.550781 48.058594 28 48.058594 Z M 33 48.058594 C 32.449219 48.058594 32 48.503906 32 49.058594 L 32 51.058594 C 32 51.609375 32.449219 52.058594 33 52.058594 C 33.550781 52.058594 34 51.609375 34 51.058594 L 34 49.058594 C 34 48.503906 33.550781 48.058594 33 48.058594 Z M 38 48.058594 C 37.449219 48.058594 37 48.503906 37 49.058594 L 37 51.058594 C 37 51.609375 37.449219 52.058594 38 52.058594 C 38.550781 52.058594 39 51.609375 39 51.058594 L 39 49.058594 C 39 48.503906 38.550781 48.058594 38 48.058594 Z M 43 48.058594 C 42.449219 48.058594 42 48.503906 42 49.058594 L 42 51.058594 C 42 51.609375 42.449219 52.058594 43 52.058594 C 43.550781 52.058594 44 51.609375 44 51.058594 L 44 49.058594 C 44 48.503906 43.550781 48.058594 43 48.058594 Z M 48 48.058594 C 47.449219 48.058594 47 48.503906 47 49.058594 L 47 51.058594 C 47 51.609375 47.449219 52.058594 48 52.058594 C 48.550781 52.058594 49 51.609375 49 51.058594 L 49 49.058594 C 49 48.503906 48.550781 48.058594 48 48.058594 Z M 53 48.058594 C 52.449219 48.058594 52 48.503906 52 49.058594 L 52 51.058594 C 52 51.609375 52.449219 52.058594 53 52.058594 C 53.550781 52.058594 54 51.609375 54 51.058594 L 54 49.058594 C 54 48.503906 53.550781 48.058594 53 48.058594 Z">
+            </path>
+        </svg>
+        <h1 class="my-4 text-4xl tracking-widest text-sky-300">BARANGKU</h1>
+        <p>Manajemen Barang Sederhana di Lokal Tanpa Database</p>
+    </div>
+    <div x-data class="container px-4 mx-auto my-10">
+
+        <!-- Profile -->
+        <div class="flex my-6">
+            <div class="w-2/3">
+                <h2 class="mb-2 text-xl leading-none md:text-4xl">Hello,
+                    <span class="font-bold leading-6 break-words cursor-pointer bg-slate-50"
+                        x-text="$store.barangku.username" x-on:click="$store.barangku.setPilihUsername()"></span>
+                </h2>
+                <p class="leading-5">Barangmu beres bersama <span class="underline decoration-sky-300">Barangku</span>
+                </p>
+            </div>
+            <div class="w-1/3">
+                <img x-on:click="$store.barangku.setPilihAvatar()"
+                    class="w-20 h-20 ml-auto rounded-full cursor-pointer bg-sky-300" :src="$store.barangku.img"
+                    alt="Profile Picture">
+            </div>
+        </div>
+
+        <!-- Cari Barang-barang -->
+        <div class="my-10">
+            <div class="flex gap-2">
+                <form x-on:submit.prevent="$store.barangku.cariBarang()"
+                    class="flex items-center flex-1 px-2 bg-white border rounded-xl">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                    </svg>
+                    <input x-model="$store.barangku.keywordCari" type="text" class="w-full px-2 py-1 outline-none"
+                        placeholder="Cari barang berdasarkan nama ...">
+                </form>
+                <button
+                    class="flex items-center justify-center gap-2 px-4 py-1 border rounded-md border-sky-300 text-slate-800 hover:bg-sky-200 hover:text-slate-950 bg-sky-100"
+                    title="Tambah Barang" x-on:click="$store.barangku.setPilihBarang()">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span class="hidden md:inline">Tambah Barang</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- List Barang -->
+        <!-- Aslina -->
+        <template x-if="!$store.barangku.keywordCari">
+            <div>
+                <template x-if="!$store.barangku.barang.length">
+                    <div class="flex flex-wrap justify-center gap-4">
+                        <div class="flex items-center justify-center w-full gap-2 px-4 py-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+                            </svg>
+                            <div>Barang Masih Kosong!</div>
+                        </div>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor" class="w-16 h-16 ">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                        </svg>
+                    </div>
+                </template>
+                <template x-if="$store.barangku.barang.length">
+                    <template :key="item.id" x-for="(item, index) in $store.barangku.barang">
+                        <div
+                            class="flex flex-wrap items-center justify-between px-4 py-1 my-4 border-2 border-sky-300 rounded-2xl">
+                            <div>
+                                <img :src="item.category.icon" :alt="item.category.namaKategori">
+                            </div>
+                            <div class="flex-1 pl-4">
+                                <div class="text-3xl" x-text="item.nama"></div>
+                                <div class="flex">
+                                    <div x-text="item.category.namaKategori"></div>
+                                    <div class="px-1">•</div>
+                                    <div x-text="item.banyak"></div>
+                                </div>
+                            </div>
+                            <div
+                                class="relative flex flex-row w-full gap-2 pt-2 mt-2 border-t-2 md:border-t-0 md:mt-0 md:pt-0 justify-evenly md:flex-col md:w-auto border-t-sky-300">
+                                <div class="absolute right-0 flex items-center justify-center h-full px-4 text-lg rounded-full md:text-3xl text-slate-800 bg-sky-300 opacity-20 -top-16 md:top-0 aspect-square -z-10 md:-left-14"
+                                    x-text="index+1">
+                                </div>
+                                <button x-on:click="$store.barangku.setPilihEdit(item.id, index)" class=" min-w-[6rem] px-4 py-1 border rounded-md hover:bg-amber-200
+                                hover:text-amber-950 bg-amber-100 text-amber-900">Edit</button>
+                                <button x-on:click="$store.barangku.deleteBarang(item.id)"
+                                    class="min-w-[6rem] px-4 py-1 border rounded-md hover:bg-red-200 hover:text-red-950 bg-red-100 text-red-900">Delete</button>
+                            </div>
+                        </div>
+                    </template>
+                </template>
+            </div>
+        </template>
+        <!-- Filterna -->
+        <template x-if="$store.barangku.keywordCari">
+            <div>
+                <template x-if="!$store.barangku.filteredBarang().length">
+                    <div class="flex flex-wrap justify-center gap-4">
+                        <div class="flex items-center justify-center w-full gap-2 px-4 py-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+                            </svg>
+                            <div>Barang Tidak Ditemukan!</div>
+                        </div>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor" class="w-16 h-16 ">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                        </svg>
+                    </div>
+                </template>
+                <template x-if="$store.barangku.filteredBarang().length">
+                    <template :key="item.id" x-for="(item, index) in $store.barangku.filteredBarang()">
+                        <div
+                            class="flex flex-wrap items-center justify-between px-4 py-1 my-4 border-2 border-sky-300 rounded-2xl">
+                            <div>
+                                <img :src="item.category.icon" :alt="item.category.namaKategori">
+                            </div>
+                            <div class="flex-1 pl-4">
+                                <div class="text-3xl" x-text="item.nama"></div>
+                                <div class="flex">
+                                    <div x-text="item.category.namaKategori"></div>
+                                    <div class="px-1">•</div>
+                                    <div x-text="item.banyak"></div>
+                                </div>
+                            </div>
+                            <div
+                                class="relative flex flex-row w-full gap-2 pt-2 mt-2 border-t-2 md:border-t-0 md:mt-0 md:pt-0 justify-evenly md:flex-col md:w-auto border-t-sky-300">
+                                <div class="absolute right-0 flex items-center justify-center h-full px-4 text-lg rounded-full md:text-3xl text-slate-800 bg-sky-300 opacity-20 -top-16 md:top-0 aspect-square -z-10 md:-left-14"
+                                    x-text="index+1">
+                                </div>
+                                <button x-on:click="$store.barangku.setPilihEdit(item.id, index)" class=" min-w-[6rem] px-4 py-1 border rounded-md hover:bg-amber-200
+                                hover:text-amber-950 bg-amber-100 text-amber-900">Edit</button>
+                                <button x-on:click="$store.barangku.deleteBarang(item.id)"
+                                    class="min-w-[6rem] px-4 py-1 border rounded-md hover:bg-red-200 hover:text-red-950 bg-red-100 text-red-900">Delete</button>
+                            </div>
+                        </div>
+                    </template>
+                </template>
+            </div>
+        </template>
+    </div>
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.store('barangku', {
+                modal: false,
+                pilihAvatar: false,
+                setPilihAvatar() {
+                    this.modal = !this.modal;
+                    this.pilihAvatar = !this.pilihAvatar;
+                },
+                img: Alpine.$persist('https://api.dicebear.com/6.x/lorelei/svg?seed=Peanut'),
+                setAvatar(avatar) {
+                    this.img = avatar;
+                    this.setPilihAvatar();
+                },
+                avatars: [
+                    'https://api.dicebear.com/6.x/lorelei/svg?seed=Peanut',
+                    'https://api.dicebear.com/6.x/lorelei/svg?seed=Oreo',
+                    'https://api.dicebear.com/6.x/lorelei/svg?seed=Zoey',
+                    'https://api.dicebear.com/6.x/lorelei/svg?seed=Sheba',
+                    'https://api.dicebear.com/6.x/lorelei/svg?seed=Mimi',
+                    'https://api.dicebear.com/6.x/lorelei/svg?seed=Kitty'
+                ],
+                username: Alpine.$persist('Username'),
+                pilihUsername: false,
+                setPilihUsername() {
+                    this.modal = !this.modal;
+                    this.pilihUsername = !this.pilihUsername;
+                },
+                listKategori: [
+                    {
+                        index: 0,
+                        namaKategori: 'Topi',
+                        icon: 'https://img.icons8.com/wired/64/detective-hat.png',
+                    },
+                    {
+                        index: 1,
+                        namaKategori: 'Baju',
+                        icon: 'https://img.icons8.com/wired/64/t-shirt.png',
+                    },
+                    {
+                        index: 2,
+                        namaKategori: 'Celana',
+                        icon: 'https://img.icons8.com/wired/64/jeans.png',
+                    },
+                    {
+                        index: 3,
+                        namaKategori: 'Alas Kaki',
+                        icon: 'https://img.icons8.com/wired/64/flip-flops.png',
+                    },
+                    {
+                        index: 4,
+                        namaKategori: 'Pakaian Lainnya',
+                        icon: 'https://img.icons8.com/wired/64/hanger.png',
+                    },
+                    {
+                        index: 5,
+                        namaKategori: 'Perhiasan',
+                        icon: 'https://img.icons8.com/wired/64/diamond-ring.png',
+                    },
+                    {
+                        index: 6,
+                        namaKategori: 'Kecantikan',
+                        icon: 'https://img.icons8.com/wired/64/barbershop.png',
+                    },
+                    {
+                        index: 7,
+                        namaKategori: 'Perabotan',
+                        icon: 'https://img.icons8.com/wired/64/wardrobe.png',
+                    },
+                    {
+                        index: 8,
+                        namaKategori: 'Kendaraan',
+                        icon: 'https://img.icons8.com/wired/64/fiat-500.png',
+                    },
+                    {
+                        index: 9,
+                        namaKategori: 'Makanan',
+                        icon: 'https://img.icons8.com/wired/64/cupcake.png',
+                    },
+                    {
+                        index: 10,
+                        namaKategori: 'Minuman',
+                        icon: 'https://img.icons8.com/wired/64/iced-coffee.png',
+                    },
+                    {
+                        index: 11,
+                        namaKategori: 'Perkakas',
+                        icon: 'https://img.icons8.com/wired/64/hammer.png',
+                    },
+                    {
+                        index: 12,
+                        namaKategori: 'Gadget',
+                        icon: 'https://img.icons8.com/wired/64/cell-phone.png',
+                    }
+                ],
+                barang: Alpine.$persist([]),
+                pilihBarang: false,
+                setPilihBarang() {
+                    this.modal = !this.modal;
+                    this.pilihBarang = !this.pilihBarang;
+                },
+                namaBarang: '',
+                kategori: '',
+                banyak: '',
+                addBarang() {
+                    JSON.stringify(this.barang.push({
+                        id: Date.now(),
+                        nama: 'Celana Formal',
+                        category: {
+                            namaKategori: 'Celana',
+                            icon: 'https://img.icons8.com/wired/64/jeans.png',
+                        },
+                        banyak: 1
+                    }));
+                },
+                setBarang() {
+                    if (!this.namaBarang) {
+                        alert("Nama Barang harus diisi");
+                        return;
+                    }
+                    if (!this.banyak) {
+                        alert("Banyak harus diisi");
+                        return;
+                    }
+                    if (!this.kategori) {
+                        alert("Kategori harus diisi");
+                        return;
+                    }
+                    JSON.stringify(this.barang.push({
+                        id: Date.now(),
+                        nama: this.namaBarang,
+                        category: this.listKategori[this.kategori],
+                        banyak: this.banyak
+                    }));
+                    this.namaBarang = '';
+                    this.kategori = '';
+                    this.banyak = 0;
+                    this.setPilihBarang();
+                },
+                pilihEdit: false,
+                indexBarang: '',
+                setPilihEdit(id, index) {
+                    if (!this.namaBarang) {
+                        this.namaBarang = this.barang.filter(item => item.id == id)[0].nama;
+                        this.kategori = this.listKategori.filter((item) => item.namaKategori == this.barang.filter(item => item.id == id)[0].category.namaKategori)[0].index;
+                        this.banyak = this.barang.filter(item => item.id == id)[0].banyak;
+                        this.indexBarang = index;
+                    } else {
+                        this.namaBarang = '';
+                        this.kategori = '';
+                        this.banyak = 0;
+                        this.indexBarang = '';
+                    }
+                    this.modal = !this.modal;
+                    this.pilihEdit = !this.pilihEdit;
+                },
+                updateBarang() {
+                    this.barang.splice(this.indexBarang, 1, {
+                        id: this.barang[this.indexBarang].id,
+                        nama: this.namaBarang,
+                        category: this.listKategori[this.kategori],
+                        banyak: this.banyak
+                    });
+                    this.setPilihEdit();
+                },
+                deleteBarang(id) {
+                    if (confirm('Yakin mau hapus barangmu?')) {
+                        this.barang = this.barang.filter((item) => item.id != id);
+                    }
+                },
+                resetBarang() {
+                    this.barang = [];
+                },
+                keywordCari: '',
+                filteredBarang() {
+                    return this.barang.filter((item) => item.nama.startsWith(this.keywordCari));
+                },
+                cariBarang() {
+                    console.log(this.barang.filter((item) => item.nama.startsWith(this.keywordCari)));
+                }
+            })
+        })
+    </script>
+</body>
+
+</html>
