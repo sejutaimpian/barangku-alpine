@@ -414,25 +414,26 @@
                     this.setPilihBarang();
                 },
                 pilihEdit: false,
-                indexBarang: '',
+                idBarang: '',
                 setPilihEdit(id, index) {
                     if (!this.namaBarang) {
                         this.namaBarang = this.barang.filter(item => item.id == id)[0].nama;
                         this.kategori = this.listKategori.filter((item) => item.namaKategori == this.barang.filter(item => item.id == id)[0].category.namaKategori)[0].index;
                         this.banyak = this.barang.filter(item => item.id == id)[0].banyak;
-                        this.indexBarang = index;
+                        this.idBarang = id;
                     } else {
                         this.namaBarang = '';
                         this.kategori = '';
                         this.banyak = 0;
-                        this.indexBarang = '';
+                        this.idBarang = '';
                     }
                     this.modal = !this.modal;
                     this.pilihEdit = !this.pilihEdit;
                 },
                 updateBarang() {
-                    this.barang.splice(this.indexBarang, 1, {
-                        id: this.barang[this.indexBarang].id,
+                    let index = this.barang.findIndex(item => item.id == this.idBarang);
+                    this.barang.splice(index, 1, {
+                        id: this.idBarang,
                         nama: this.namaBarang,
                         category: this.listKategori[this.kategori],
                         banyak: this.banyak
