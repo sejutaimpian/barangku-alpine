@@ -315,17 +315,10 @@
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.store('barangku', {
+                // Modal
                 modal: false,
-                pilihAvatar: false,
-                setPilihAvatar() {
-                    this.modal = !this.modal;
-                    this.pilihAvatar = !this.pilihAvatar;
-                },
-                img: Alpine.$persist('https://api.dicebear.com/6.x/lorelei/svg?seed=Peanut'),
-                setAvatar(avatar) {
-                    this.img = avatar;
-                    this.setPilihAvatar();
-                },
+
+                // List Avatar
                 avatars: [
                     'https://api.dicebear.com/6.x/lorelei/svg?seed=Peanut',
                     'https://api.dicebear.com/6.x/lorelei/svg?seed=Oreo',
@@ -334,12 +327,28 @@
                     'https://api.dicebear.com/6.x/lorelei/svg?seed=Mimi',
                     'https://api.dicebear.com/6.x/lorelei/svg?seed=Kitty'
                 ],
+                // Avatar
+                img: Alpine.$persist('https://api.dicebear.com/6.x/lorelei/svg?seed=Peanut'),
+                pilihAvatar: false,
+                setPilihAvatar() {
+                    this.modal = !this.modal;
+                    this.pilihAvatar = !this.pilihAvatar;
+                },
+                setAvatar(avatar) {
+                    this.img = avatar;
+                    this.setPilihAvatar();
+                },
+
+                // Username
                 username: Alpine.$persist('Username'),
                 pilihUsername: false,
                 setPilihUsername() {
                     this.modal = !this.modal;
                     this.pilihUsername = !this.pilihUsername;
                 },
+
+                // BARANG
+                // List Kategori Barang
                 listKategori: [
                     {
                         index: 0,
@@ -407,50 +416,51 @@
                         icon: 'https://img.icons8.com/wired/64/cell-phone.png',
                     }
                 ],
+                // Form Barang
+                namaBarang: '',
+                kategori: '',
+                banyak: '',
+                validasiFormBarang() {
+                    if (!this.namaBarang) {
+                        alert("Nama Barang harus diisi");
+                        return false;
+                    }
+                    if (!this.banyak || this.banyak == 0) {
+                        alert("Banyak harus diisi");
+                        return false;
+                    }
+                    if (!this.kategori) {
+                        alert("Kategori harus diisi");
+                        return false;
+                    }
+                    return true;
+                },
+                resetFormBarang() {
+                    this.namaBarang = '';
+                    this.kategori = '';
+                    this.banyak = '';
+                },
+                // Persist Barang
                 barang: Alpine.$persist([]),
+                // Tambah Barang
                 pilihBarang: false,
                 setPilihBarang() {
                     this.modal = !this.modal;
                     this.pilihBarang = !this.pilihBarang;
                 },
-                namaBarang: '',
-                kategori: '',
-                banyak: '',
-                addBarang() {
-                    JSON.stringify(this.barang.push({
-                        id: Date.now(),
-                        nama: 'Celana Formal',
-                        category: {
-                            namaKategori: 'Celana',
-                            icon: 'https://img.icons8.com/wired/64/jeans.png',
-                        },
-                        banyak: 1
-                    }));
-                },
                 setBarang() {
-                    if (!this.namaBarang) {
-                        alert("Nama Barang harus diisi");
-                        return;
+                    if (this.validasiFormBarang()) {
+                        this.barang.push({
+                            id: Date.now(),
+                            nama: this.namaBarang,
+                            category: this.listKategori[this.kategori],
+                            banyak: this.banyak
+                        });
+                        this.resetFormBarang();
+                        this.setPilihBarang();
                     }
-                    if (!this.banyak) {
-                        alert("Banyak harus diisi");
-                        return;
-                    }
-                    if (!this.kategori) {
-                        alert("Kategori harus diisi");
-                        return;
-                    }
-                    JSON.stringify(this.barang.push({
-                        id: Date.now(),
-                        nama: this.namaBarang,
-                        category: this.listKategori[this.kategori],
-                        banyak: this.banyak
-                    }));
-                    this.namaBarang = '';
-                    this.kategori = '';
-                    this.banyak = 0;
-                    this.setPilihBarang();
                 },
+                // Edit Barang
                 pilihEdit: false,
                 idBarang: '',
                 setPilihEdit(id, index) {
@@ -460,41 +470,80 @@
                         this.banyak = this.barang.filter(item => item.id == id)[0].banyak;
                         this.idBarang = id;
                     } else {
-                        this.namaBarang = '';
-                        this.kategori = '';
-                        this.banyak = 0;
+                        this.resetFormBarang();
                         this.idBarang = '';
                     }
                     this.modal = !this.modal;
                     this.pilihEdit = !this.pilihEdit;
                 },
                 updateBarang() {
-                    let index = this.barang.findIndex(item => item.id == this.idBarang);
-                    this.barang.splice(index, 1, {
-                        id: this.idBarang,
-                        nama: this.namaBarang,
-                        category: this.listKategori[this.kategori],
-                        banyak: this.banyak
-                    });
-                    this.setPilihEdit();
+                    if (this.validasiFormBarang()) {
+                        let index = this.barang.findIndex(item => item.id == this.idBarang);
+                        this.barang.splice(index, 1, {
+                            id: this.idBarang,
+                            nama: this.namaBarang,
+                            category: this.listKategori[this.kategori],
+                            banyak: this.banyak
+                        });
+                        this.setPilihEdit();
+                    }
                 },
+                // Hapus Barang
                 deleteBarang(id) {
                     if (confirm('Yakin mau hapus barangmu?')) {
                         this.barang = this.barang.filter((item) => item.id != id);
                     }
                 },
+                // Reset Barang
                 resetBarang() {
                     if (confirm('Yakin mau reset barangmu?')) {
                         this.barang = [];
                     }
                 },
+                // Cari Barang
                 keywordCari: '',
                 filteredBarang() {
                     return this.barang.filter((item) => item.nama.startsWith(this.keywordCari));
                 },
                 cariBarang() {
                     console.log(this.barang.filter((item) => item.nama.startsWith(this.keywordCari)));
-                }
+                },
+
+                // Development
+                addBarang() {
+                    // Pilih Salah Satu
+                    // Push 
+                    this.barang.push({
+                        id: 3,
+                        nama: 'Sepatu Aerostreet',
+                        category: {
+                            namaKategori: 'Alas Kaki',
+                            icon: 'https://img.icons8.com/wired/64/flip-flops.png',
+                        },
+                        banyak: 2
+                    });
+                    // Assignment
+                    this.barang = [
+                        {
+                            id: 1,
+                            nama: 'Celana Formal',
+                            category: {
+                                namaKategori: 'Celana',
+                                icon: 'https://img.icons8.com/wired/64/jeans.png',
+                            },
+                            banyak: 1
+                        },
+                        {
+                            id: 2,
+                            nama: 'Baju Batik',
+                            category: {
+                                namaKategori: 'Baju',
+                                icon: 'https://img.icons8.com/wired/64/t-shirt.png',
+                            },
+                            banyak: 10
+                        }
+                    ];
+                },
             })
         })
     </script>
