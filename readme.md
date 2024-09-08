@@ -20,6 +20,6 @@ Sebagai anak kost yang apatis, saya tidak terlalu memperdulikan barang-barang ap
 # Repo & Demo
 
 Repo: https://github.com/sejutaimpian/barangku-alpine
-Demo: https://barangku.sampurasun.my.id/
+Demo: https://barangku.kid.my.id
 
 # Terima Kasih
